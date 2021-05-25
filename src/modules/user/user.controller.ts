@@ -35,12 +35,9 @@ export class UserController {
   }
 
   @Patch(':id')
-  async updateUser(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() user: User,
-  ): Promise<UserDto> {
-    const updatedUser = await this._userService.create(user);
-    return updatedUser;
+  async updateUser(@Param('id', ParseIntPipe) id: number, @Body() user: User) {
+    await this._userService.update(id, user);
+    return true;
   }
 
   @Delete(':id')
