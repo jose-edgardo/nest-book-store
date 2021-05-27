@@ -10,6 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { userInfo } from 'os';
 import { User } from './user.entity';
 import { UserService } from './user.service';
 
@@ -45,5 +46,13 @@ export class UserController {
   @Delete(':id')
   async deleteUser(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this._userService.delete(id);
+  }
+
+  @Post('setRole/:userId/:roleId')
+  async setRoleToUser(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Param('roleId', ParseIntPipe) roleId: number,
+  ) {
+    return this._userService.setRoleToUser(userId, roleId);
   }
 }
