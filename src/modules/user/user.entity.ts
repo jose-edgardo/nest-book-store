@@ -10,6 +10,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Book } from '../book/book.entity';
 import { Role } from '../role/role.entity';
 import { UserDetails } from './user.details.entity';
 
@@ -41,6 +42,10 @@ export class User extends BaseEntity {
   @ManyToMany(() => Role, (role) => role.users, { eager: true })
   @JoinTable({ name: 'user_roles' })
   roles: Role[];
+
+  @ManyToMany(() => Book, (book) => book.authors)
+  @JoinTable({ name: 'user_books' })
+  books: Book[];
 
   @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
   createdAt: Date;
