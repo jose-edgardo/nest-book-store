@@ -1,4 +1,71 @@
-import { Controller } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { RoleType } from '../../shared/roletype.enum';
+import { GetUser } from '../auth/user.decorator';
+import { Roles } from '../role/decorators/role.decorator';
+import { RoleGuard } from '../role/guards/role.guard';
+import { BookService } from './book.service';
+import { CreateBookDto, ReadBookDto, UpdateBookDto } from './dtos';
 
 @Controller('book')
-export class BookController {}
+export class BookController {
+  constructor(private readonly _bookService: BookService) {}
+
+  @Get(':bookId')
+  getBook(@Param('bookId', ParseIntPipe) bookId: number): Promise<ReadBookDto> {
+    return this._bookService.get(bookId);
+  }
+
+  @Get('authors/:authorId')
+  getBooksByAuthor(
+    @Param('authorId', ParseIntPipe) authorId: number,
+  ): Promise<ReadBookDto[]> {
+    return this._bookService.getBookByAuthor(authorId);
+  }
+
+  @Get()
+  getBooks(): Promise<ReadBookDto[]> {
+    return this._bookService.getAll();
+  }
+
+  @Post()
+  @Roles(RoleType.AUTHOR)
+  @UseGuards(AuthGuard(), RoleGuard)
+  createBook(@Body() role: Partial<CreateBookDto>): Promise<ReadBookDto> {
+    return this._bookService.create(role);
+  }
+
+  @Roles(RoleType.AUTHOR)
+  @UseGuards(AuthGuard(), RoleGuard)
+  @Post()
+  createBookByAuthor(
+    @Body() role: Partial<CreateBookDto>,
+    @GetUser('id') authorId: number,
+  ): Promise<ReadBookDto> {
+    return this._bookService.createByAuthor(role, authorId);
+  }
+
+  @Patch(':bookId')
+  updateBook(
+    @Param('bookId', ParseIntPipe) bookId: number,
+    @Body() role: Partial<UpdateBookDto>,
+    @GetUser('id') authorId: number,
+  ): Promise<ReadBookDto> {
+    return this._bookService.update(bookId, role, authorId);
+  }
+
+  @Delete(':bookId')
+  delete(@Param('bookId', ParseIntPipe) bookId: number): Promise<void> {
+    return this._bookService.delete(bookId);
+  }
+}

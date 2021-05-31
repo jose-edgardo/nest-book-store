@@ -3,7 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinTable,
+  JoinColumn,
   ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -22,7 +22,7 @@ export class Book extends BaseEntity {
   description: string;
 
   @ManyToMany(() => User, (user) => user.books, { eager: true })
-  @JoinTable()
+  @JoinColumn()
   authors: User[];
 
   @Column({ type: 'varchar', default: 'ACTIVE', nullable: false, length: 8 })
